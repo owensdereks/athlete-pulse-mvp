@@ -1,79 +1,265 @@
-/* src/App.css */
+/* Global Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background-color: #F4F5F7;
+  color: #1a1a1a;
+}
+
 .dashboard-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  color: #333;
+  padding: 24px 32px;
 }
 
+/* Header */
 .header {
-  margin-bottom: 2rem;
-  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.alert-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+.header-left h1 {
+  margin: 0 0 4px 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: #1a1a1a;
 }
 
-.alert-column h2 {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
+.header-date {
+  margin: 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.header-right {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.btn-add-athlete {
+  padding: 10px 20px;
+  background-color: #e53935;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btn-add-athlete:hover {
+  background-color: #c62828;
+}
+
+/* Section Styling */
+.focus-section,
+.roster-section {
+  margin-bottom: 48px;
+}
+
+.section-header {
+  font-size: 12px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
+  color: #374151;
+  margin: 0 0 8px 0;
 }
 
-.card {
+.section-divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin-bottom: 24px;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
   background: white;
   border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  border-left: 5px solid #ccc;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.card h3 {
-  margin: 0 0 0.5rem 0;
+.empty-state p {
+  margin: 0;
+  font-size: 18px;
+  color: #6b7280;
 }
 
-.card button {
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  cursor: pointer;
+/* Focus List Cards */
+.focus-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.focus-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid;
+  padding: 20px 24px;
+}
+
+.focus-card.status-critical {
+  border-left-color: #e53935;
+}
+
+.focus-card.status-warning {
+  border-left-color: #fbbf24;
+}
+
+.focus-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.focus-card-info {
+  flex: 1;
+}
+
+.focus-card-info h3 {
+  margin: 0 0 6px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.days-since {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.status-badge.status-critical {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.status-badge.status-warning {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge.status-on-track {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+/* Buttons */
+.btn-contacted {
+  padding: 10px 24px;
+  background-color: #e53935;
+  color: white;
   border: none;
-  border-radius: 4px;
-  font-weight: bold;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: inherit;
 }
 
-/* Priority Styles */
-.ghost-card {
-  border-left-color: #e74c3c; /* Red */
-  background-color: #fff5f5;
+.btn-contacted:hover {
+  background-color: #c62828;
 }
-.ghost-card button {
-  background-color: #e74c3c;
+
+.btn-contacted-small {
+  padding: 8px 16px;
+  background-color: #e53935;
   color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
 }
 
-.hype-card {
-  border-left-color: #2ecc71; /* Green */
-  background-color: #f0fff4;
-}
-.hype-card button {
-  background-color: #2ecc71;
-  color: white;
+.btn-contacted-small:hover {
+  background-color: #c62828;
 }
 
-.info-card {
-  border-left-color: #3498db; /* Blue */
+/* Roster Table */
+.roster-table {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
-.badge {
-  background: #eee;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  margin-right: 0.5rem;
+.roster-header,
+.roster-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1fr;
+  gap: 20px;
+  padding: 16px 24px;
+  align-items: center;
+}
+
+.roster-header {
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b7280;
+}
+
+.roster-row {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.roster-row:last-child {
+  border-bottom: none;
+}
+
+.roster-row:hover {
+  background-color: #f9fafb;
+}
+
+.roster-col-name strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 2px;
+}
+
+.athlete-email {
+  display: block;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.roster-col-days {
+  font-size: 14px;
+  color: #374151;
+}
+
+.roster-col-action {
+  text-align: right;
 }

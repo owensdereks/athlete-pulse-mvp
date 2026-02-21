@@ -1,96 +1,111 @@
-import type { Athlete, Workout } from "../data/mockData";
+import type { Athlete } from "../data/mockData";
 
 export interface Alert {
   athleteId: number;
   athleteName: string;
-  type: "GHOST" | "HYPE" | "SHUFFLE" | "NEWBIE";
+  type: "GHOST" | "HYPE" | "SHUFFLE" | "NEWBIE" | "WARNING";
   priority: number;
   message: string;
 }
 
-export const generateFocusList = (athletes: Athlete[], workouts: Workout[]): Alert[] => {
+export type AthleteStatus = "critical" | "warning" | "on-track";
+
+export const getAthleteStatus = (athlete: Athlete): AthleteStatus => {
+  const today = new Date();
+
+  // Compute daysSinceContact
+  const contactDate = athlete.lastContactedDate
+    ? new Date(athlete.lastContactedDate)
+    : new Date(athlete.memberSince);
+
+  const daysSinceContact = Math.floor((today.getTime() - contactDate.getTime()) / (1000 * 3600 * 24));
+
+  // Compute tenureStatus
+  const memberDate = new Date(athlete.memberSince);
+  const daysSinceMember = Math.floor((today.getTime() - memberDate.getTime()) / (1000 * 3600 * 24));
+  const tenureStatus = daysSinceMember < 90 ? 'new' : 'tenured';
+
+  // Apply thresholds
+  if (tenureStatus === 'tenured' && daysSinceContact >= 7) {
+    return "critical";
+  } else if (tenureStatus === 'new' && daysSinceContact >= 3) {
+    return "critical";
+  } else if (tenureStatus === 'tenured' && daysSinceContact >= 6) {
+    return "warning";
+  } else if (tenureStatus === 'new' && daysSinceContact >= 2) {
+    return "warning";
+  }
+
+  return "on-track";
+};
+
+export const generateFocusList = (athletes: Athlete[]): Alert[] => {
   const alerts: Alert[] = [];
-  // Hardcoded "Today" to match the mock data dates
-  const today = new Date("2026-02-03"); 
+  const today = new Date();
 
   athletes.forEach((athlete) => {
-    // Get workouts for this specific athlete
-    const athleteWorkouts = workouts.filter((w) => w.athleteId === athlete.id);
+    // 1. Compute daysSinceContact
+    const contactDate = athlete.lastContactedDate
+      ? new Date(athlete.lastContactedDate)
+      : new Date(athlete.memberSince); // Fallback if never contacted
 
-    // ---------------------------------------------------------
-    // RULE 1: GHOST PROTOCOL (High Priority)
-    // Trigger: Missed 2+ workouts in the past
-    // ---------------------------------------------------------
-    const missed = athleteWorkouts.filter(w => w.completedDate === null && new Date(w.workoutDate) < today);
-    
-    if (missed.length >= 2) {
-      alerts.push({ 
-        athleteId: athlete.id, 
-        athleteName: athlete.firstName, 
-        type: "GHOST", 
-        priority: 1, 
-        message: `Missed ${missed.length} recent workouts` 
+    const daysSinceContact = Math.floor((today.getTime() - contactDate.getTime()) / (1000 * 3600 * 24));
+
+    // 2. Compute tenureStatus
+    const memberDate = new Date(athlete.memberSince);
+    const daysSinceMember = Math.floor((today.getTime() - memberDate.getTime()) / (1000 * 3600 * 24));
+    const tenureStatus = daysSinceMember < 90 ? 'new' : 'tenured';
+
+    // 3. Apply thresholds
+
+    // GHOST alerts (priority 1)
+    if (tenureStatus === 'tenured' && daysSinceContact >= 7) {
+      alerts.push({
+        athleteId: athlete.id,
+        athleteName: athlete.firstName,
+        type: "GHOST",
+        priority: 1,
+        message: `No contact in ${daysSinceContact} days`
+      });
+    } else if (tenureStatus === 'new' && daysSinceContact >= 3) {
+      alerts.push({
+        athleteId: athlete.id,
+        athleteName: athlete.firstName,
+        type: "GHOST",
+        priority: 1,
+        message: `No contact in ${daysSinceContact} days`
       });
     }
-
-    // ---------------------------------------------------------
-    // RULE 2: HYPE BELL (Wins)
-    // Trigger: High intensity workout completed today
-    // ---------------------------------------------------------
-    const bigWins = athleteWorkouts.filter(w => {
-        const isToday = w.completedDate === "2026-02-03";
-        const isHard = w.ifActual > 0.85 || w.tssActual > 150;
-        return isToday && isHard;
-    });
-
-    if (bigWins.length > 0) {
-      alerts.push({ 
-        athleteId: athlete.id, 
-        athleteName: athlete.firstName, 
-        type: "HYPE", 
-        priority: 2, 
-        message: `Crushed "${bigWins[0].title}"!` 
+    // Warning alerts (priority 2) - within 1 day of threshold
+    else if (tenureStatus === 'tenured' && daysSinceContact >= 6) {
+      alerts.push({
+        athleteId: athlete.id,
+        athleteName: athlete.firstName,
+        type: "WARNING",
+        priority: 2,
+        message: `Last contact ${daysSinceContact} days ago — check in soon`
       });
-    }
-
-    // ---------------------------------------------------------
-    // RULE 3: NEWBIE SHIELD (Retention)
-    // Trigger: Member for < 90 days
-    // ---------------------------------------------------------
-    const joinDate = new Date(athlete.memberSince);
-    const daysSince = (today.getTime() - joinDate.getTime()) / (1000 * 3600 * 24);
-
-    if (daysSince < 90 && daysSince > 0) {
-        // Only flag if they aren't already a Ghost (to avoid double alerts)
-        const isGhost = alerts.some(a => a.athleteId === athlete.id && a.type === "GHOST");
-        if (!isGhost) {
-            alerts.push({ 
-                athleteId: athlete.id, 
-                athleteName: athlete.firstName, 
-                type: "NEWBIE", 
-                priority: 3, 
-                message: `Day ${Math.floor(daysSince)} check-in` 
-            });
-        }
-    }
-
-    // ---------------------------------------------------------
-    // RULE 4: SCHEDULE SHUFFLE (Instability)
-    // Trigger: Completed date != Planned date
-    // ---------------------------------------------------------
-    const shuffled = athleteWorkouts.filter(w => w.completedDate && w.workoutDate !== w.completedDate);
-    
-    if (shuffled.length > 0) {
-        alerts.push({ 
-            athleteId: athlete.id, 
-            athleteName: athlete.firstName, 
-            type: "SHUFFLE", 
-            priority: 3, 
-            message: "Moved workouts around" 
-        });
+    } else if (tenureStatus === 'new' && daysSinceContact >= 2) {
+      alerts.push({
+        athleteId: athlete.id,
+        athleteName: athlete.firstName,
+        type: "WARNING",
+        priority: 2,
+        message: `Last contact ${daysSinceContact} days ago — check in soon`
+      });
     }
   });
 
-  // Sort by Priority (1 is highest)
-  return alerts.sort((a, b) => a.priority - b.priority);
+  // Sort by priority ascending, then daysSinceContact descending
+  return alerts.sort((a, b) => {
+    if (a.priority !== b.priority) {
+      return a.priority - b.priority;
+    }
+    // Extract days from message for secondary sort
+    const getDays = (msg: string) => {
+      const match = msg.match(/(\d+) days/);
+      return match ? parseInt(match[1]) : 0;
+    };
+    return getDays(b.message) - getDays(a.message);
+  });
 };

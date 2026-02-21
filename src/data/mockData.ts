@@ -4,6 +4,8 @@ export interface Athlete {
   lastName: string;
   email: string;
   memberSince: string;
+  lastContactedDate: string | null;
+  tenureStatus: 'new' | 'tenured';
 }
 
 export interface Workout {
@@ -25,6 +27,8 @@ export const athletes: Athlete[] = [
     lastName: "Johnson",
     email: "sarah.j@example.com",
     memberSince: "2025-12-01",
+    lastContactedDate: "2026-01-25", // 9 days ago from Feb 3
+    tenureStatus: 'new',
   },
   {
     id: 2,
@@ -32,6 +36,8 @@ export const athletes: Athlete[] = [
     lastName: "Chen",
     email: "mike.c@example.com",
     memberSince: "2024-06-15",
+    lastContactedDate: "2026-02-02", // 1 day ago
+    tenureStatus: 'tenured',
   },
   {
     id: 3,
@@ -39,6 +45,8 @@ export const athletes: Athlete[] = [
     lastName: "Rivera",
     email: "alex.r@example.com",
     memberSince: "2025-11-20",
+    lastContactedDate: null, // Never contacted
+    tenureStatus: 'new',
   },
   {
     id: 4,
@@ -46,6 +54,8 @@ export const athletes: Athlete[] = [
     lastName: "Davis",
     email: "emma.d@example.com",
     memberSince: "2023-08-10",
+    lastContactedDate: "2026-01-30", // 4 days ago
+    tenureStatus: 'tenured',
   },
 ];
 
